@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class RomanArabicCalculator {
@@ -5,11 +6,12 @@ public class RomanArabicCalculator {
     static int number1, number2; // два операнда
     static char operation; // оператор
     static int result; // результат операции
+    //private static ? extends Object[] numbersAvailable;
 
     /**
      * Римско - арабский калькулятор
      */
-    public static void main (String[] args) {
+    public static void main (String[] args) throws Exception {
         System.out.println("Введите выражение в римском или арабском формате + Enter ");
 
 //      Считываем строку userInput которую ввёл пользователь
@@ -36,7 +38,7 @@ public class RomanArabicCalculator {
             }
         }
 
-
+        // Вычленение и форматирование чисел:
         String empty_array_filled = String.valueOf(empty_array); //пользователь ввел значения
         String[] splitted_array = empty_array_filled.split("[+-/*]"); // метод возвращает массив строк (операнды)
         String number_first = splitted_array[0]; // первое число
@@ -44,29 +46,50 @@ public class RomanArabicCalculator {
         String correct_number_first = number_first.trim(); // первое число (форматированное без пробелов)
         String correct_number_second = number_second.trim(); // второе число (форматированное без пробелов)
 
+
+        // Проверка на допустимость значений:
+        String[] numbersAvailable = {"O", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        if (!Arrays.stream(numbersAvailable).toList().contains((correct_number_first))) {
+            System.out.println("Первый операнд вне допустимых значений [1;10]");
+            System.exit(2);
+        }
+        if (!Arrays.stream(numbersAvailable).toList().contains((correct_number_second))) {
+            System.out.println("Второй операнд вне допустимых значений [1;10]");
+            System.exit(3);
+        }
+
+
+        // Возвращение арабских чисел
         number1 = Roman.romanToNumber(correct_number_first);
         number2 = Roman.romanToNumber(correct_number_second);
 
-        if (number1 < 0 && number2 < 0) {
+
+        // Если введенное число арабское, вернется арабская минус единица. Если римское, вернется арабское число больше 0.
+        // Выражение false, только если оба числа положительны или оба отрицательны.
+        if ((number1 > 0 & number2 < 0) || (number1 < 0 & number2 > 0)){
+        throw new Exception("Работа калькулятора возможна только с операндами одной системы");}
+
+        // Если оба отрицательны результат будет ноль. Программа пойдет в блок ниже.
+        // Если false, значит,цифры римские (оба положительные). Программа пойдет в блок else.
+        if (number1 < 0 & number2 < 0) {
             result = 0;
         } else {
             result = Arithmetic.calculate(number1, number2, operation);
+
             System.out.println("Результат для римских цифр:");
             String resultRoman = Roman.convertNumToRoman(result);
             System.out.println(correct_number_first + " " + operation + " " + correct_number_second + " = " + resultRoman);
             System.exit(1);
         }
 
-
+        // Работа с арабскими числами
         number1 = Integer.parseInt(correct_number_first);
         number2 = Integer.parseInt(correct_number_second);
 
-        if (number1 >10 | number2>10) {
-            System.out.println("Только числа от 1 до 10 включительно");
-        } else {
-            result = Arithmetic.calculate(number1, number2, operation);
-            System.out.println("Результат для арабских цифр:");
-            System.out.println(number1 + " " + operation + " " + number2 + " = " + result);
+        result = Arithmetic.calculate(number1, number2, operation);
 
-        }}
+        System.out.println("Результат для арабских цифр:");
+        System.out.println(number1 + " " + operation + " " + number2 + " = " + result);
+
+    }
 }
